@@ -3,8 +3,9 @@ package com.wakita181009.cleanarchitecture.domain.error
 import com.wakita181009.cleanarchitecture.domain.valueobject.PageSize
 
 sealed class PageSizeError(
-    val message: String,
-) {
+    message: String?,
+    cause: Throwable? = null,
+) : DomainError(message, cause) {
     data class BelowMinimum(
         val value: Int,
     ) : PageSizeError("Page size must be at least ${PageSize.MIN_VALUE}, but was $value")
