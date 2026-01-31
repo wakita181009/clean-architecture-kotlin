@@ -1,2 +1,2 @@
-rootProject.name = "clean_architecture_kotlin"
+rootProject.name = "clean-architecture-kotlin"
 include("domain", "application", "infrastructure", "presentation", "framework")

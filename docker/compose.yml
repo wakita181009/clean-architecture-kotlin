@@ -1,4 +1,4 @@
-name: clean_architecture_kotlin
+name: clean-architecture-kotlin
 services:
   postgres:
     image: postgres:18-alpine
