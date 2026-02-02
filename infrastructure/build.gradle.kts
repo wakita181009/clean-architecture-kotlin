@@ -31,7 +31,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
     api("io.projectreactor.kotlin:reactor-kotlin-extensions:1.3.0")
     // Fix reactive-streams: It seems org.jooq.Publisher (version 1.0.3) and org.reactivestreams.Publisher (version 1.0.4) are incompatible.
-    api("org.reactivestreams:reactive-streams:1.0.3")
+    api("org.reactivestreams:reactive-streams:1.0.4")
     jooqCodegen("org.postgresql:postgresql:42.7.9")
     runtimeOnly("org.postgresql:postgresql") // JDBC for flyway & jOOQ Generator
     runtimeOnly("org.postgresql:r2dbc-postgresql") // R2DBC for app
