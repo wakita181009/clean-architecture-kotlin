@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.3.0"
 ktlint = "14.0.1"
-spring = "3.5.4"
+spring = "4.0.2"
 spring-dependencies = "1.1.7"
 arrow-kt = "2.2.1.1"
 graphql-kotlin = "9.0.0-alpha.8"
