@@ -10,6 +10,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.arrow)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 tasks.test {

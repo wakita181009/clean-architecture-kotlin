@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.spring)
-    alias(libs.plugins.spring.dependencies)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.spring)
@@ -9,6 +8,7 @@ plugins {
 
 dependencies {
     api(project(":application"))
+    implementation(platform(libs.spring.boot.dependencies))
     api("org.springframework.boot:spring-boot-starter")
     api("org.springframework.boot:spring-boot-starter-data-r2dbc")
     api("org.springframework.boot:spring-boot-starter-jdbc")

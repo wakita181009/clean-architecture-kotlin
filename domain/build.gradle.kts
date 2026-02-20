@@ -10,6 +10,8 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.arrow)
+    testImplementation(libs.kotest.property)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 tasks.test {

@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.spring)
-    alias(libs.plugins.spring.dependencies)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kover)
     application
@@ -11,6 +10,7 @@ plugins {
 dependencies {
     implementation(project(":infrastructure"))
     implementation(project(":presentation"))
+    implementation(platform(libs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation(libs.kotlinx.coroutines.reactor)
