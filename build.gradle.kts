@@ -39,7 +39,7 @@ subprojects {
 
 kover {
     merge {
-        allProjects()
+        projects(":domain", ":application", ":presentation")
     }
 }
 
