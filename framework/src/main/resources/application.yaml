@@ -1,0 +1,19 @@
+spring:
+  main:
+    banner-mode: OFF
+  r2dbc:
+    url: "r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}"
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  datasource:
+    url: "jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}"
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  flyway:
+    enabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+
+server:
+  port: 8080
