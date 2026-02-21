@@ -22,28 +22,36 @@ import arrow.core.raise.ensure   // for ensure() inside either{}
 ### `Either<E, T>` — return type for all fallible operations
 
 ```kotlin
-// Domain repository interface
-fun findById(id: GitHubRepoId): Either<GitHubError, GitHubRepo>
+// Domain repository interface (CQRS: write-only)
+fun save(entity: GitHubRepo): Either<GitHubError, GitHubRepo>
 
-// Application use case interface
-fun execute(id: Long): Either<GitHubRepoFindByIdError, GitHubRepo>
+// Application command use case
+fun execute(dto: GitHubRepoDto): Either<GitHubRepoSaveError, GitHubRepo>
+
+// Application query use case (bypasses domain)
+fun execute(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto>
 ```
 
 ### `either { }` + `.bind()` — compose multiple Either operations
 
 ```kotlin
-override fun execute(pageNumber: Int, pageSize: Int): Either<GitHubRepoListError, Page<GitHubRepo>> =
+// Command use case example
+override fun execute(dto: GitHubRepoDto): Either<GitHubRepoSaveError, GitHubRepo> =
     either {
-        val validPageNumber = PageNumber.of(pageNumber)
-            .mapLeft(GitHubRepoListError::InvalidPageNumber)
+        val entity = dto.toDomain()
+            .mapLeft(GitHubRepoSaveError::InvalidInput)
             .bind()
-        val validPageSize = PageSize.of(pageSize)
-            .mapLeft(GitHubRepoListError::InvalidPageSize)
-            .bind()
-        gitHubRepoRepository.list(validPageNumber, validPageSize)
-            .mapLeft(GitHubRepoListError::FetchFailed)
+        gitHubRepoRepository.save(entity)    // domain repo (write-only)
+            .mapLeft(GitHubRepoSaveError::SaveFailed)
             .bind()
     }
+
+// Query use case example (bypasses domain, uses query repository)
+override fun execute(pageNumber: Int, pageSize: Int): Either<GitHubRepoListQueryError, PageDto<GitHubRepoQueryDto>> =
+    gitHubRepoQueryRepository.list(             // query repo (read-only)
+        limit = pageSize,
+        offset = (pageNumber - 1) * pageSize,
+    )
 ```
 
 - `.bind()` unwraps `Right`, short-circuits on `Left`
@@ -104,4 +112,4 @@ Preferred over `.map{}.getOrElse{}` when both branches produce equally important
 
 ## Layer-by-Layer Reference
 
-For per-layer patterns and complete examples, see [references/layer-patterns.md](references/layer-patterns.md).
+For per-layer CA patterns and complete implementation examples (domain/application/infrastructure/presentation, including jOOQ + DGS specifics): see the `ca-kotlin` skill.

@@ -6,16 +6,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'FILE=\"$CLAUDE_TOOL_RESULT_FILE_PATH\"; if [[ \"$FILE\" == */domain/* ]]; then VIOLATIONS=$(grep -nE \"^import (org\\.springframework|jakarta|javax)\\.|^import com\\.wakita181009\\.cleanarchitecture\\.(application|infrastructure|presentation)\\.\" \"$FILE\" 2>/dev/null); if [[ -n \"$VIOLATIONS\" ]]; then echo \"[LAYER VIOLATION] Forbidden import in domain layer:\"; echo \"$VIOLATIONS\"; fi; fi'"
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && ./gradlew ktlintFormat 2>&1 | tail -60",
+            "timeout": 30
           }
         ]
-      },
+      }
+    ],
+    "Stop": [
       {
-        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'FILE=\"$CLAUDE_TOOL_RESULT_FILE_PATH\"; if [[ \"$FILE\" == */application/* ]]; then VIOLATIONS=$(grep -nE \"^import (org\\.springframework|jakarta|javax)\\.|^import com\\.wakita181009\\.cleanarchitecture\\.(infrastructure|presentation)\\.\" \"$FILE\" 2>/dev/null); if [[ -n \"$VIOLATIONS\" ]]; then echo \"[LAYER VIOLATION] Forbidden import in application layer:\"; echo \"$VIOLATIONS\"; fi; fi'"
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && ./gradlew detekt 2>&1 | tail -60",
+            "timeout": 120
           }
         ]
       }

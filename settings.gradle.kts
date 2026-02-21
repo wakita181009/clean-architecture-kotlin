@@ -1,2 +1,2 @@
 rootProject.name = "clean-architecture-kotlin"
-include("domain", "application", "infrastructure", "presentation", "framework")
+include("domain", "application", "infrastructure", "presentation", "framework", "detekt-rules")

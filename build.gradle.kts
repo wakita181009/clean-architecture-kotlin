@@ -41,10 +41,48 @@ kover {
     merge {
         projects(":domain", ":application", ":presentation")
     }
+    reports {
+        verify {
+            rule {
+                bound {
+                    minValue = 80
+                }
+            }
+        }
+    }
+}
+
+val detektClasspath: Configuration by configurations.creating
+val detektTask =
+    tasks.register<JavaExec>("detekt") {
+        mainClass.set("dev.detekt.cli.Main")
+        classpath = detektClasspath
+        dependsOn(":detekt-rules:jar")
+
+        val input = projectDir
+        val config = "$projectDir/detekt.yml"
+        val exclude = ".*/build/.*,.*/resources/.*"
+
+        args("--input", input, "--config", config, "--excludes", exclude)
+        // argumentProviders is evaluated at execution time to resolve the plugin jar path
+        argumentProviders.add {
+            listOf(
+                "--plugins",
+                project(":detekt-rules")
+                    .tasks
+                    .getByName("jar")
+                    .outputs.files.asPath,
+            )
+        }
+    }
+
+tasks.check {
+    dependsOn(detektTask)
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
+    detektClasspath(libs.detekt.cli)
 }
 
 repositories {

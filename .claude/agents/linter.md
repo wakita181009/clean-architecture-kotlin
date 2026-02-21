@@ -35,7 +35,21 @@ Execute ktlint check via Gradle:
 
 Report the output clearly, grouped by module.
 
-### 3. Output Format
+### 3. Run Detekt
+
+Execute Detekt static analysis:
+```bash
+./gradlew detekt
+```
+
+This checks for:
+- `NoThrowOutsidePresentation` rule — `throw` usage in domain/application/infrastructure layers
+- `ForbiddenLayerImport` rule — forbidden cross-layer imports
+- Other code quality rules
+
+Report any CA architecture violations separately from style violations.
+
+### 4. Output Format
 
 ```
 IMPORT VIOLATIONS:
@@ -43,6 +57,10 @@ IMPORT VIOLATIONS:
 
 KTLINT VIOLATIONS:
 - application/.../SomeUseCase.kt:12:4 — Unexpected blank line(s) before "}"
+
+DETEKT VIOLATIONS:
+- NoThrowOutsidePresentation: infrastructure/.../SomeRepo.kt:42 — throw found outside presentation layer
+- ForbiddenLayerImport: application/.../SomeUseCase.kt:5 — forbidden import: org.springframework
 
 CLEAN:
 - No violations found in: [list of checked files]

@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.3.10"
 ktlint = "14.0.1"
+detekt = "2.0.0-alpha.2"
 spring = "4.0.3"
 arrow-kt = "2.2.1.1"
 mockk = "1.14.9"
@@ -23,6 +24,8 @@ jooq-meta-extensions = { group = "org.jooq", name = "jooq-meta-extensions", vers
 dgs-platform = { group = "com.netflix.graphql.dgs", name = "graphql-dgs-platform-dependencies", version.ref = "dgs" }
 dgs-spring-graphql-starter = { group = "com.netflix.graphql.dgs", name = "graphql-dgs-spring-graphql-starter", version.ref = "dgs" }
 graphql-extended-scalars = { group = "com.graphql-java", name = "graphql-java-extended-scalars" }
+detekt-api = { group = "dev.detekt", name = "detekt-api", version.ref = "detekt" }
+detekt-cli = { group = "dev.detekt", name = "detekt-cli", version.ref = "detekt" }
 # Test libraries
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }

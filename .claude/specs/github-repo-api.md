@@ -193,17 +193,35 @@ All error responses share the following structure:
 
 ---
 
-## Layer Mapping
+## Layer Mapping (CQRS)
 
-| Layer              | Key classes                                                                   |
-|--------------------|-------------------------------------------------------------------------------|
-| Domain entity      | `GitHubRepository`                                                            |
-| Domain errors      | `GitHubError` (`InvalidId`, `NotFound`, `RepositoryError`)                    |
-| Repo interface     | `GitHubRepoRepository` (in `domain/`)                                         |
-| Use cases          | `GitHubRepoListUseCase`, `GitHubRepoFindByIdUseCase`, `GitHubRepoSaveUseCase` |
-| Application errors | `GitHubRepoListError`, `GitHubRepoFindByIdError`, `GitHubRepoSaveError`       |
-| Infra repo impl    | `GitHubRepoRepositoryImpl` (JPA)                                              |
-| JPA entity         | `GitHubRepoJpaEntity`                                                         |
-| Controller         | `GitHubRepoController`                                                        |
-| Request DTO        | `GitHubRepoRequest`                                                           |
-| Response DTO       | `GitHubRepoResponse`, `GitHubRepoListResponse`                                |
+### Command Side (Write)
+
+| Layer              | Key classes                                                                  |
+|--------------------|------------------------------------------------------------------------------|
+| Domain entity      | `GitHubRepo`                                                                 |
+| Domain errors      | `GitHubError` (`InvalidId`, `NotFound`, `RepositoryError`)                   |
+| Domain repo iface  | `GitHubRepoRepository` (in `domain/`) — `save()` only                        |
+| Command use case   | `GitHubRepoSaveUseCase` (in `application/command/usecase/`)                  |
+| Command DTO        | `GitHubRepoDto` (in `application/command/dto/`)                              |
+| Command errors     | `GitHubRepoSaveError` (in `application/command/error/`)                      |
+| Infra repo impl    | `GitHubRepoRepositoryImpl` (jOOQ + R2DBC, in `infrastructure/command/repository/`)   |
+
+### Query Side (Read)
+
+| Layer              | Key classes                                                                  |
+|--------------------|------------------------------------------------------------------------------|
+| Query repo iface   | `GitHubRepoQueryRepository` (in `application/query/repository/`)             |
+| Query use cases    | `GitHubRepoFindByIdQueryUseCase`, `GitHubRepoListQueryUseCase` (in `application/query/usecase/`) |
+| Query DTOs         | `GitHubRepoQueryDto`, `PageDto` (in `application/query/dto/`)               |
+| Query errors       | `GitHubRepoFindByIdQueryError`, `GitHubRepoListQueryError` (in `application/query/error/`) |
+| Infra query impl   | `GitHubRepoQueryRepositoryImpl` (jOOQ + R2DBC, in `infrastructure/query/repository/`)   |
+
+### Presentation (shared)
+
+| Layer              | Key classes                                                                  |
+|--------------------|------------------------------------------------------------------------------|
+| REST Controller    | `GitHubRepoController`                                                       |
+| GraphQL            | `GitHubRepoDataFetcher`, `GitHubRepoGraphQLMapper`                           |
+| Request DTO        | `GitHubRepoRequest`                                                          |
+| Response DTOs      | `GitHubRepoResponse`, `GitHubRepoListResponse`                               |
