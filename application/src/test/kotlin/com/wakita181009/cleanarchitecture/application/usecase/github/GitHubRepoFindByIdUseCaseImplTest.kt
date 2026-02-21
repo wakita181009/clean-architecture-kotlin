@@ -31,23 +31,20 @@ class GitHubRepoFindByIdUseCaseImplTest {
         }
 
     @Test
+    fun `execute returns Left InvalidId when id is not positive`() =
+        runTest {
+            val error = useCase.execute(0L).shouldBeLeft()
+            error shouldBe GitHubRepoFindByIdError.InvalidId(GitHubError.InvalidId(0L))
+        }
+
+    @Test
     fun `execute returns Left NotFound when repo is not found`() =
         runTest {
-            val domainError = GitHubError.NotFound(1L)
+            val domainError = GitHubError.NotFound(GitHubRepoId(1L))
             coEvery { repository.findById(any()) } returns Either.Left(domainError)
 
             val error = useCase.execute(1L).shouldBeLeft()
             error shouldBe GitHubRepoFindByIdError.NotFound(domainError)
-        }
-
-    @Test
-    fun `execute returns Left FetchFailed when InvalidId error occurs`() =
-        runTest {
-            val domainError = GitHubError.InvalidId()
-            coEvery { repository.findById(any()) } returns Either.Left(domainError)
-
-            val error = useCase.execute(1L).shouldBeLeft()
-            error shouldBe GitHubRepoFindByIdError.FetchFailed(domainError)
         }
 
     @Test
