@@ -30,13 +30,16 @@ domain          ← Entities, value objects, repository interfaces, errors
 
 | Layer | Technology |
 |-------|-----------|
-| Language | Kotlin 2.x |
-| Framework | Spring Boot 4.x |
-| API | Spring WebFlux (REST) |
-| Database | PostgreSQL + Spring Data R2DBC |
-| Error handling | Arrow-kt (`Either`, `Raise` DSL) |
+| Language | Kotlin 2.3.10 (JVM 25) |
+| Framework | Spring Boot 4.0.3 |
+| API | Spring WebFlux (REST, reactive) |
+| Database | PostgreSQL 18 + Spring Data R2DBC |
+| Error handling | Arrow-kt 2.2.1.1 (`Either`, `either {}` DSL) |
 | Migration | Flyway |
 | Build | Gradle (multi-project, version catalog) |
+| Testing | JUnit5 + Kotest 6.1.3 + MockK 1.14.9 |
+| Coverage | Kover 0.9.7 |
+| Linting | ktlint 14.0.1 |
 
 ## Domain Model
 
@@ -69,7 +72,7 @@ GitHubRepo
 
 ### Prerequisites
 
-- JDK 21+
+- JDK 25+
 - Docker
 
 ### 1. Start PostgreSQL
@@ -77,6 +80,8 @@ GitHubRepo
 ```bash
 docker compose -f docker/compose.yml up -d
 ```
+
+PostgreSQL listens on `localhost:6686`.
 
 ### 2. Configure environment
 
@@ -92,9 +97,10 @@ cp .env.sample .env
 
 The API is available at `http://localhost:8080`.
 
-### Example Request
+### Example Requests
 
 ```bash
+# Save a repo
 curl -X POST http://localhost:8080/api/github-repos \
   -H "Content-Type: application/json" \
   -d '{
@@ -111,7 +117,11 @@ curl -X POST http://localhost:8080/api/github-repos \
     "updatedAt": "2024-01-01T00:00:00Z"
   }'
 
-curl http://localhost:8080/api/github-repos
+# List repos
+curl "http://localhost:8080/api/github-repos?pageNumber=1&pageSize=10"
+
+# Find by ID
+curl http://localhost:8080/api/github-repos/1
 ```
 
 ## Project Structure
@@ -120,27 +130,59 @@ curl http://localhost:8080/api/github-repos
 .
 ├── domain/                   # Pure Kotlin — no framework dependencies
 │   └── src/main/kotlin/
-│       ├── entity/github/    # GitHubRepository
+│       ├── entity/github/    # GitHubRepo
 │       ├── error/            # DomainError, GitHubError, PageNumberError, PageSizeError
 │       ├── repository/       # GitHubRepoRepository (interface)
-│       └── valueobject/      # Page, PageNumber, PageSize, GitHubRepoId, ...
+│       └── valueobject/      # Page, PageNumber, PageSize, GitHubRepoId, GitHubOwner, GitHubRepoName
 │
 ├── application/              # Pure Kotlin — depends only on domain
 │   └── src/main/kotlin/
-│       ├── error/github/     # GitHubRepoListError, FindByIdError, SaveError
-│       └── usecase/github/   # List, FindById, Save (interface + impl)
+│       ├── dto/github/       # GitHubRepoDto
+│       ├── error/github/     # GitHubRepoListError, GitHubRepoFindByIdError, GitHubRepoSaveError
+│       └── usecase/github/   # GitHubRepoListUseCase, GitHubRepoFindByIdUseCase, GitHubRepoSaveUseCase (interface + impl)
 │
 ├── infrastructure/           # Spring + R2DBC — implements domain interfaces
 │   └── src/main/kotlin/
 │       ├── entity/           # GitHubRepoR2dbcEntity
 │       └── repository/       # GitHubRepoR2dbcRepository, GitHubRepoRepositoryImpl
 │
-├── presentation/             # Spring MVC — controllers and DTOs
+├── presentation/             # Spring WebFlux — controllers and DTOs
 │   └── src/main/kotlin/
-│       └── rest/             # GitHubRepoController, request/response DTOs
+│       └── rest/             # GitHubRepoController
+│           └── dto/          # GitHubRepoRequest, GitHubRepoResponse, GitHubRepoListResponse, ErrorResponse
 │
 └── framework/                # Spring Boot entry point and DI wiring
     └── src/main/kotlin/
         ├── Application.kt
         └── config/           # UseCaseConfig (manual DI for use cases)
+```
+
+## Running Tests
+
+```bash
+./gradlew test
+```
+
+## Code Coverage
+
+Coverage is collected via Kover across the `domain`, `application`, and `presentation` modules.
+
+```bash
+./gradlew koverHtmlReport
+```
+
+## Linting
+
+```bash
+./gradlew ktlintCheck
+./gradlew ktlintFormat
+```
+
+## Docker
+
+A `Dockerfile` is provided for containerized deployment. Build the fat JAR first:
+
+```bash
+./gradlew :framework:bootJar
+docker build -t clean-architecture-kotlin .
 ```

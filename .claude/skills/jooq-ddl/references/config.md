@@ -1,31 +1,20 @@
+# jOOQ Gradle Configuration
+
+## `infrastructure/build.gradle.kts`
+
+```kotlin
 import org.jooq.meta.jaxb.MatcherRule
 import org.jooq.meta.jaxb.MatcherTransformType
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.spring)
-    alias(libs.plugins.ktlint)
-    alias(libs.plugins.kover)
-    alias(libs.plugins.kotlin.spring)
+    // ... other plugins
     alias(libs.plugins.jooq.codegen)
 }
 
 dependencies {
-    api(project(":application"))
-    implementation(platform(libs.spring.boot.dependencies))
-    api("org.springframework.boot:spring-boot-starter")
-    api("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    api("org.springframework.boot:spring-boot-starter-jdbc")
-    runtimeOnly("org.postgresql:r2dbc-postgresql")
-    runtimeOnly("org.postgresql:postgresql")
-    implementation(libs.flyway.database.postgresql)
-    implementation(libs.kotlinx.coroutines.reactor)
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation(kotlin("stdlib"))
+    // ... other deps
     api("org.jooq:jooq")
-
-    jooqCodegen(libs.jooq.meta.extensions)
+    jooqCodegen(libs.jooq.meta.extensions)   // version managed via libs.versions.toml
 }
 
 jooq {
@@ -81,3 +70,25 @@ tasks.compileKotlin {
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
     enabled = false
 }
+```
+
+## `gradle/libs.versions.toml`
+
+```toml
+[versions]
+jooq = "3.19.30"   # Pin to match the jOOQ version used at runtime
+
+[libraries]
+jooq-meta-extensions = { group = "org.jooq", name = "jooq-meta-extensions", version.ref = "jooq" }
+
+[plugins]
+jooq-codegen = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }
+```
+
+> **Note**: Spring Boot's BOM manages `org.jooq:jooq` at runtime. The `[versions]` entry
+> pins the **codegen plugin** version — keep it in sync with the BOM-managed runtime version.
+
+Check the BOM-managed version:
+```
+./gradlew :infrastructure:dependencyInsight --dependency jooq-core
+```
