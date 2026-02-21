@@ -70,9 +70,20 @@ class GitHubRepoControllerTest {
         }
 
     @Test
+    fun `findById returns 400 when id is invalid`() =
+        runTest {
+            val error = GitHubRepoFindByIdError.InvalidId(GitHubError.InvalidId(0L))
+            coEvery { findByIdUseCase.execute(0L) } returns Either.Left(error)
+
+            val response = controller.findById(0L)
+            response.statusCode shouldBe HttpStatus.BAD_REQUEST
+            response.body shouldBe ErrorResponse(error.message)
+        }
+
+    @Test
     fun `findById returns 404 when repo is not found`() =
         runTest {
-            val error = GitHubRepoFindByIdError.NotFound(GitHubError.NotFound(1L))
+            val error = GitHubRepoFindByIdError.NotFound(GitHubError.NotFound(GitHubRepoId(1L)))
             coEvery { findByIdUseCase.execute(1L) } returns Either.Left(error)
 
             val response = controller.findById(1L)
@@ -80,14 +91,14 @@ class GitHubRepoControllerTest {
         }
 
     @Test
-    fun `findById returns 400 when fetch fails`() =
+    fun `findById returns 500 when fetch fails`() =
         runTest {
             val error = GitHubRepoFindByIdError.FetchFailed(GitHubError.RepositoryError("DB error"))
             coEvery { findByIdUseCase.execute(1L) } returns Either.Left(error)
 
             val response = controller.findById(1L)
-            response.statusCode shouldBe HttpStatus.BAD_REQUEST
-            response.body shouldBe ErrorResponse(error.message)
+            response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+            response.body shouldBe ErrorResponse("Internal server error")
         }
 
     // --- save ---
@@ -104,14 +115,25 @@ class GitHubRepoControllerTest {
         }
 
     @Test
-    fun `save returns 400 with error body when save fails`() =
+    fun `save returns 422 with error body when validation fails`() =
+        runTest {
+            val error = GitHubRepoSaveError.ValidationFailed(GitHubError.InvalidId(0L))
+            coEvery { saveUseCase.execute(any()) } returns Either.Left(error)
+
+            val response = controller.save(sampleRequest())
+            response.statusCode shouldBe HttpStatus.UNPROCESSABLE_CONTENT
+            response.body shouldBe ErrorResponse(error.message)
+        }
+
+    @Test
+    fun `save returns 500 with error body when save fails`() =
         runTest {
             val error = GitHubRepoSaveError.SaveFailed(GitHubError.RepositoryError("Save failed"))
             coEvery { saveUseCase.execute(any()) } returns Either.Left(error)
 
             val response = controller.save(sampleRequest())
-            response.statusCode shouldBe HttpStatus.BAD_REQUEST
-            response.body shouldBe ErrorResponse(error.message)
+            response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+            response.body shouldBe ErrorResponse("Internal server error")
         }
 }
 

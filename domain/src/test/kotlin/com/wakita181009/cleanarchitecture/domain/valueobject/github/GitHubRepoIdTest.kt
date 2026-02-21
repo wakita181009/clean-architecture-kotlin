@@ -9,46 +9,40 @@ import kotlin.test.Test
 
 class GitHubRepoIdTest {
     @Test
-    fun `of returns Right for valid numeric string`() {
-        val result = GitHubRepoId.of("123")
+    fun `of returns Right for minimum valid id`() {
+        val result = GitHubRepoId.of(1L)
         val id = result.shouldBeRight()
-        id.value shouldBe 123L
+        id.value shouldBe 1L
     }
 
     @Test
-    fun `of returns Right for large numeric string`() {
-        val result = GitHubRepoId.of("9999999")
+    fun `of returns Right for large id`() {
+        val result = GitHubRepoId.of(9999999L)
         val id = result.shouldBeRight()
         id.value shouldBe 9999999L
     }
 
     @Test
-    fun `of returns Left InvalidId for non-numeric string`() {
-        val error = GitHubRepoId.of("abc").shouldBeLeft()
+    fun `of returns Left InvalidId for zero`() {
+        val error = GitHubRepoId.of(0L).shouldBeLeft()
         error.shouldBeInstanceOf<GitHubError.InvalidId>()
     }
 
     @Test
-    fun `of returns Left InvalidId for empty string`() {
-        val error = GitHubRepoId.of("").shouldBeLeft()
+    fun `of returns Left InvalidId for negative id`() {
+        val error = GitHubRepoId.of(-1L).shouldBeLeft()
         error.shouldBeInstanceOf<GitHubError.InvalidId>()
     }
 
     @Test
-    fun `of returns Left InvalidId for decimal string`() {
-        val error = GitHubRepoId.of("1.5").shouldBeLeft()
-        error.shouldBeInstanceOf<GitHubError.InvalidId>()
-    }
-
-    @Test
-    fun `InvalidId error message is set correctly`() {
-        val error = GitHubError.InvalidId()
-        error.message shouldBe "Invalid GitHub repo ID format"
+    fun `InvalidId error message contains the invalid value`() {
+        val error = GitHubError.InvalidId(-1L)
+        error.message shouldBe "Invalid GitHub repo ID: -1 (must be positive)"
     }
 
     @Test
     fun `NotFound error message contains the id`() {
-        val error = GitHubError.NotFound(42L)
+        val error = GitHubError.NotFound(GitHubRepoId(42L))
         error.message shouldBe "GitHub repo not found: 42"
     }
 }

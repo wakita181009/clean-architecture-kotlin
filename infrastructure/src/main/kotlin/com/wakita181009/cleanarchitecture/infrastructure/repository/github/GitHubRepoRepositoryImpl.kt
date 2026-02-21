@@ -28,7 +28,7 @@ class GitHubRepoRepositoryImpl(
                     .catch { r2dbcRepository.findById(id.value).awaitSingleOrNull() }
                     .mapLeft { GitHubError.RepositoryError("Failed to find repo: ${it.message}", it) }
                     .bind()
-            if (entity == null) raise(GitHubError.NotFound(id.value))
+            if (entity == null) raise(GitHubError.NotFound(id))
             entity.toDomain()
         }
 

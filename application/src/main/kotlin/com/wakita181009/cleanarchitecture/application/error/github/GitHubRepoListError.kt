@@ -21,6 +21,6 @@ sealed interface GitHubRepoListError : ApplicationError {
     data class FetchFailed(
         val cause: GitHubError,
     ) : GitHubRepoListError {
-        override val message = "Failed to fetch GitHub repos: ${cause.message}"
+        override val message = cause.message
     }
 }

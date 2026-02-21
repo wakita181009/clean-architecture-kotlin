@@ -1,9 +1,6 @@
 package com.wakita181009.cleanarchitecture.presentation.rest.dto
 
-import com.wakita181009.cleanarchitecture.domain.entity.github.GitHubRepo
-import com.wakita181009.cleanarchitecture.domain.valueobject.github.GitHubOwner
-import com.wakita181009.cleanarchitecture.domain.valueobject.github.GitHubRepoId
-import com.wakita181009.cleanarchitecture.domain.valueobject.github.GitHubRepoName
+import com.wakita181009.cleanarchitecture.application.dto.github.GitHubRepoDto
 import java.time.OffsetDateTime
 
 data class GitHubRepoRequest(
@@ -19,11 +16,11 @@ data class GitHubRepoRequest(
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
 ) {
-    fun toDomain() =
-        GitHubRepo(
-            id = GitHubRepoId(id),
-            owner = GitHubOwner(owner),
-            name = GitHubRepoName(name),
+    fun toDto() =
+        GitHubRepoDto(
+            id = id,
+            owner = owner,
+            name = name,
             fullName = fullName,
             description = description,
             language = language,
