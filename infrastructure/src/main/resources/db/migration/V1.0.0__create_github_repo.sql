@@ -9,8 +9,8 @@ CREATE TABLE github_repo
     stargazers_count INT          NOT NULL DEFAULT 0,
     forks_count      INT          NOT NULL DEFAULT 0,
     is_private       BOOLEAN      NOT NULL DEFAULT false,
-    created_at       TIMESTAMPTZ  NOT NULL,
-    updated_at       TIMESTAMPTZ  NOT NULL
+    created_at       TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at       TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE INDEX idx_github_repo_owner ON github_repo (owner);

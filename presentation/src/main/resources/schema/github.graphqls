@@ -1,0 +1,44 @@
+scalar Long
+scalar DateTime
+
+type Query {
+    githubRepo(id: Long!): GitHubRepo
+    githubRepos(pageNumber: Int = 1, pageSize: Int = 20): GitHubRepoPage!
+}
+
+type Mutation {
+    saveGitHubRepo(input: GitHubRepoInput!): GitHubRepo!
+}
+
+type GitHubRepo {
+    id: Long!
+    owner: String!
+    name: String!
+    fullName: String!
+    description: String
+    language: String
+    stargazersCount: Int!
+    forksCount: Int!
+    isPrivate: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type GitHubRepoPage {
+    items: [GitHubRepo!]!
+    totalCount: Int!
+}
+
+input GitHubRepoInput {
+    id: Long!
+    owner: String!
+    name: String!
+    fullName: String!
+    description: String
+    language: String
+    stargazersCount: Int = 0
+    forksCount: Int = 0
+    isPrivate: Boolean = false
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
