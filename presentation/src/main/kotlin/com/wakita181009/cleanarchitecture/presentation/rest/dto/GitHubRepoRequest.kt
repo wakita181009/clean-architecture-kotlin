@@ -1,6 +1,6 @@
 package com.wakita181009.cleanarchitecture.presentation.rest.dto
 
-import com.wakita181009.cleanarchitecture.application.dto.github.GitHubRepoDto
+import com.wakita181009.cleanarchitecture.application.command.dto.github.GitHubRepoDto
 import java.time.OffsetDateTime
 
 data class GitHubRepoRequest(

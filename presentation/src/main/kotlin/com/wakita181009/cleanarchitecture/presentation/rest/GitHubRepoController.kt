@@ -1,11 +1,11 @@
 package com.wakita181009.cleanarchitecture.presentation.rest
 
-import com.wakita181009.cleanarchitecture.application.error.github.GitHubRepoFindByIdError
-import com.wakita181009.cleanarchitecture.application.error.github.GitHubRepoListError
-import com.wakita181009.cleanarchitecture.application.error.github.GitHubRepoSaveError
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoFindByIdUseCase
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoListUseCase
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoSaveUseCase
+import com.wakita181009.cleanarchitecture.application.command.error.github.GitHubRepoSaveError
+import com.wakita181009.cleanarchitecture.application.command.usecase.github.GitHubRepoSaveUseCase
+import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubRepoFindByIdQueryError
+import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubRepoListQueryError
+import com.wakita181009.cleanarchitecture.application.query.usecase.github.GitHubRepoFindByIdQueryUseCase
+import com.wakita181009.cleanarchitecture.application.query.usecase.github.GitHubRepoListQueryUseCase
 import com.wakita181009.cleanarchitecture.presentation.rest.dto.ErrorResponse
 import com.wakita181009.cleanarchitecture.presentation.rest.dto.GitHubRepoListResponse
 import com.wakita181009.cleanarchitecture.presentation.rest.dto.GitHubRepoRequest
@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/github-repos")
 class GitHubRepoController(
-    private val gitHubRepoListUseCase: GitHubRepoListUseCase,
-    private val gitHubRepoFindByIdUseCase: GitHubRepoFindByIdUseCase,
+    private val gitHubRepoListQueryUseCase: GitHubRepoListQueryUseCase,
+    private val gitHubRepoFindByIdQueryUseCase: GitHubRepoFindByIdQueryUseCase,
     private val gitHubRepoSaveUseCase: GitHubRepoSaveUseCase,
 ) {
     private val logger = LoggerFactory.getLogger(GitHubRepoController::class.java)
@@ -34,20 +34,20 @@ class GitHubRepoController(
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "20") pageSize: Int,
     ): ResponseEntity<*> =
-        gitHubRepoListUseCase.execute(pageNumber, pageSize).fold(
+        gitHubRepoListQueryUseCase.execute(pageNumber, pageSize).fold(
             ifLeft = { error ->
                 when (error) {
-                    is GitHubRepoListError.InvalidPageNumber,
-                    is GitHubRepoListError.InvalidPageSize,
+                    is GitHubRepoListQueryError.InvalidPageNumber,
+                    is GitHubRepoListQueryError.InvalidPageSize,
                     -> ResponseEntity.badRequest().body(ErrorResponse(error.message))
-                    is GitHubRepoListError.FetchFailed -> {
+                    is GitHubRepoListQueryError.FetchFailed -> {
                         logger.error("Failed to list GitHub repos: ${error.message}")
                         ResponseEntity.internalServerError().body(ErrorResponse("Internal server error"))
                     }
                 }
             },
             ifRight = { page ->
-                ResponseEntity.ok(GitHubRepoListResponse.fromDomain(page))
+                ResponseEntity.ok(GitHubRepoListResponse.fromQueryDtos(page))
             },
         )
 
@@ -55,21 +55,21 @@ class GitHubRepoController(
     suspend fun findById(
         @PathVariable id: Long,
     ): ResponseEntity<*> =
-        gitHubRepoFindByIdUseCase.execute(id).fold(
+        gitHubRepoFindByIdQueryUseCase.execute(id).fold(
             ifLeft = { error ->
                 when (error) {
-                    is GitHubRepoFindByIdError.InvalidId ->
+                    is GitHubRepoFindByIdQueryError.InvalidId ->
                         ResponseEntity.badRequest().body(ErrorResponse(error.message))
-                    is GitHubRepoFindByIdError.NotFound ->
+                    is GitHubRepoFindByIdQueryError.NotFound ->
                         ResponseEntity.notFound().build<Nothing>()
-                    is GitHubRepoFindByIdError.FetchFailed -> {
+                    is GitHubRepoFindByIdQueryError.FetchFailed -> {
                         logger.error("Failed to fetch GitHub repo (id=$id): ${error.message}")
                         ResponseEntity.internalServerError().body(ErrorResponse("Internal server error"))
                     }
                 }
             },
-            ifRight = { repo ->
-                ResponseEntity.ok(GitHubRepoResponse.fromDomain(repo))
+            ifRight = { dto ->
+                ResponseEntity.ok(GitHubRepoResponse.fromQueryDto(dto))
             },
         )
 

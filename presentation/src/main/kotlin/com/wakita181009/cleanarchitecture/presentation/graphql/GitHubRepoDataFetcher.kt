@@ -7,34 +7,34 @@ import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsMutation
 import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
-import com.wakita181009.cleanarchitecture.application.error.github.GitHubRepoFindByIdError
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoFindByIdUseCase
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoListUseCase
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoSaveUseCase
+import com.wakita181009.cleanarchitecture.application.command.usecase.github.GitHubRepoSaveUseCase
+import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubRepoFindByIdQueryError
+import com.wakita181009.cleanarchitecture.application.query.usecase.github.GitHubRepoFindByIdQueryUseCase
+import com.wakita181009.cleanarchitecture.application.query.usecase.github.GitHubRepoListQueryUseCase
 import graphql.GraphQLException
 
 @DgsComponent
 class GitHubRepoDataFetcher(
-    private val gitHubRepoListUseCase: GitHubRepoListUseCase,
-    private val gitHubRepoFindByIdUseCase: GitHubRepoFindByIdUseCase,
+    private val gitHubRepoListQuery: GitHubRepoListQueryUseCase,
+    private val gitHubRepoFindByIdQuery: GitHubRepoFindByIdQueryUseCase,
     private val gitHubRepoSaveUseCase: GitHubRepoSaveUseCase,
 ) {
     @DgsQuery(field = "githubRepo")
     suspend fun githubRepo(
         @InputArgument id: Long,
     ): GitHubRepo? =
-        gitHubRepoFindByIdUseCase
+        gitHubRepoFindByIdQuery
             .execute(id)
             .fold(
                 ifLeft = { error ->
                     when (error) {
-                        is GitHubRepoFindByIdError.NotFound -> null
-                        is GitHubRepoFindByIdError.InvalidId,
-                        is GitHubRepoFindByIdError.FetchFailed,
+                        is GitHubRepoFindByIdQueryError.NotFound -> null
+                        is GitHubRepoFindByIdQueryError.InvalidId,
+                        is GitHubRepoFindByIdQueryError.FetchFailed,
                         -> throw GraphQLException(error.message)
                     }
                 },
-                ifRight = { repo -> repo.toGraphQL() },
+                ifRight = { dto -> dto.toGraphQL() },
             )
 
     @DgsQuery(field = "githubRepos")
@@ -42,7 +42,7 @@ class GitHubRepoDataFetcher(
         @InputArgument pageNumber: Int = 1,
         @InputArgument pageSize: Int = 20,
     ): GitHubRepoPage =
-        gitHubRepoListUseCase.execute(pageNumber, pageSize).fold(
+        gitHubRepoListQuery.execute(pageNumber, pageSize).fold(
             ifLeft = { error -> throw GraphQLException(error.message) },
             ifRight = { page -> page.toGraphQL() },
         )

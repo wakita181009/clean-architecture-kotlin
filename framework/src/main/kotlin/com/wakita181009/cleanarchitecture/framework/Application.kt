@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 
 @SpringBootApplication
-@EnableR2dbcRepositories(basePackages = ["com.wakita181009.cleanarchitecture.infrastructure.repository"])
+@EnableR2dbcRepositories(basePackages = ["com.wakita181009.cleanarchitecture.infrastructure"])
 @ComponentScan(
     basePackages = [
         "com.wakita181009.cleanarchitecture.infrastructure",

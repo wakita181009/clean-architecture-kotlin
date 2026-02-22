@@ -1,5 +1,6 @@
 package com.wakita181009.cleanarchitecture.presentation.rest.dto
 
+import com.wakita181009.cleanarchitecture.application.query.dto.github.GitHubRepoQueryDto
 import com.wakita181009.cleanarchitecture.domain.entity.github.GitHubRepo
 import java.time.OffsetDateTime
 
@@ -30,6 +31,21 @@ data class GitHubRepoResponse(
                 isPrivate = repo.isPrivate,
                 createdAt = repo.createdAt,
                 updatedAt = repo.updatedAt,
+            )
+
+        fun fromQueryDto(dto: GitHubRepoQueryDto) =
+            GitHubRepoResponse(
+                id = dto.id,
+                owner = dto.owner,
+                name = dto.name,
+                fullName = dto.fullName,
+                description = dto.description,
+                language = dto.language,
+                stargazersCount = dto.stargazersCount,
+                forksCount = dto.forksCount,
+                isPrivate = dto.isPrivate,
+                createdAt = dto.createdAt,
+                updatedAt = dto.updatedAt,
             )
     }
 }

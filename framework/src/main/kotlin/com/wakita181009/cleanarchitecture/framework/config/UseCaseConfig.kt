@@ -1,8 +1,9 @@
 package com.wakita181009.cleanarchitecture.framework.config
 
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoFindByIdUseCaseImpl
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoListUseCaseImpl
-import com.wakita181009.cleanarchitecture.application.usecase.github.GitHubRepoSaveUseCaseImpl
+import com.wakita181009.cleanarchitecture.application.command.usecase.github.GitHubRepoSaveUseCaseImpl
+import com.wakita181009.cleanarchitecture.application.query.repository.github.GitHubRepoQueryRepository
+import com.wakita181009.cleanarchitecture.application.query.usecase.github.GitHubRepoFindByIdQueryUseCaseImpl
+import com.wakita181009.cleanarchitecture.application.query.usecase.github.GitHubRepoListQueryUseCaseImpl
 import com.wakita181009.cleanarchitecture.domain.repository.github.GitHubRepoRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -10,12 +11,13 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class UseCaseConfig(
     private val gitHubRepoRepository: GitHubRepoRepository,
+    private val gitHubRepoQueryRepository: GitHubRepoQueryRepository,
 ) {
     @Bean
-    fun gitHubRepoListUseCase() = GitHubRepoListUseCaseImpl(gitHubRepoRepository)
+    fun gitHubRepoFindByIdQuery() = GitHubRepoFindByIdQueryUseCaseImpl(gitHubRepoQueryRepository)
 
     @Bean
-    fun gitHubRepoFindByIdUseCase() = GitHubRepoFindByIdUseCaseImpl(gitHubRepoRepository)
+    fun gitHubRepoListQuery() = GitHubRepoListQueryUseCaseImpl(gitHubRepoQueryRepository)
 
     @Bean
     fun gitHubRepoSaveUseCase() = GitHubRepoSaveUseCaseImpl(gitHubRepoRepository)
