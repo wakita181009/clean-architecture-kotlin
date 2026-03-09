@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.3.10"
-ktlint = "14.0.1"
+ktlint = "14.1.0"
 detekt = "2.0.0-alpha.2"
 spring = "4.0.3"
 arrow-kt = "2.2.1.1"
