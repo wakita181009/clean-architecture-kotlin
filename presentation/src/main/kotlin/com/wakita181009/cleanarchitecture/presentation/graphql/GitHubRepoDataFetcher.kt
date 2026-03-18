@@ -20,7 +20,7 @@ class GitHubRepoDataFetcher(
     private val gitHubRepoSaveUseCase: GitHubRepoSaveUseCase,
 ) {
     @DgsQuery(field = "githubRepo")
-    suspend fun githubRepo(
+    fun githubRepo(
         @InputArgument id: Long,
     ): GitHubRepo? =
         gitHubRepoFindByIdQuery
@@ -38,7 +38,7 @@ class GitHubRepoDataFetcher(
             )
 
     @DgsQuery(field = "githubRepos")
-    suspend fun githubRepos(
+    fun githubRepos(
         @InputArgument pageNumber: Int = 1,
         @InputArgument pageSize: Int = 20,
     ): GitHubRepoPage =
@@ -48,7 +48,7 @@ class GitHubRepoDataFetcher(
         )
 
     @DgsMutation(field = "saveGitHubRepo")
-    suspend fun saveGitHubRepo(
+    fun saveGitHubRepo(
         @InputArgument input: GitHubRepoInput,
     ): GitHubRepo =
         gitHubRepoSaveUseCase.execute(input.toDto()).fold(

@@ -20,9 +20,8 @@ import com.wakita181009.cleanarchitecture.presentation.rest.dto.GitHubRepoListRe
 import com.wakita181009.cleanarchitecture.presentation.rest.dto.GitHubRepoRequest
 import com.wakita181009.cleanarchitecture.presentation.rest.dto.GitHubRepoResponse
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
 import org.springframework.http.HttpStatus
 import java.time.OffsetDateTime
 import kotlin.test.Test
@@ -36,106 +35,97 @@ class GitHubRepoControllerTest {
     // --- list ---
 
     @Test
-    fun `list returns 200 with page body when query succeeds`() =
-        runTest {
-            val page = PageDto(totalCount = 1, items = listOf(sampleQueryDto()))
-            coEvery { listQuery.execute(1, 20) } returns Either.Right(page)
+    fun `list returns 200 with page body when query succeeds`() {
+        val page = PageDto(totalCount = 1, items = listOf(sampleQueryDto()))
+        every { listQuery.execute(1, 20) } returns Either.Right(page)
 
-            val response = controller.list(1, 20)
-            response.statusCode shouldBe HttpStatus.OK
-            response.body shouldBe GitHubRepoListResponse.fromQueryDtos(page)
-        }
+        val response = controller.list(1, 20)
+        response.statusCode shouldBe HttpStatus.OK
+        response.body shouldBe GitHubRepoListResponse.fromQueryDtos(page)
+    }
 
     @Test
-    fun `list returns 400 with error body when query fails`() =
-        runTest {
-            val error = GitHubRepoListQueryError.InvalidPageNumber(PageNumberError.BelowMinimum(0))
-            coEvery { listQuery.execute(0, 20) } returns Either.Left(error)
+    fun `list returns 400 with error body when query fails`() {
+        val error = GitHubRepoListQueryError.InvalidPageNumber(PageNumberError.BelowMinimum(0))
+        every { listQuery.execute(0, 20) } returns Either.Left(error)
 
-            val response = controller.list(0, 20)
-            response.statusCode shouldBe HttpStatus.BAD_REQUEST
-            response.body shouldBe ErrorResponse(error.message)
-        }
+        val response = controller.list(0, 20)
+        response.statusCode shouldBe HttpStatus.BAD_REQUEST
+        response.body shouldBe ErrorResponse(error.message)
+    }
 
     // --- findById ---
 
     @Test
-    fun `findById returns 200 with repo body when found`() =
-        runTest {
-            val dto = sampleQueryDto()
-            coEvery { findByIdQuery.execute(1L) } returns Either.Right(dto)
+    fun `findById returns 200 with repo body when found`() {
+        val dto = sampleQueryDto()
+        every { findByIdQuery.execute(1L) } returns Either.Right(dto)
 
-            val response = controller.findById(1L)
-            response.statusCode shouldBe HttpStatus.OK
-            response.body shouldBe GitHubRepoResponse.fromQueryDto(dto)
-        }
-
-    @Test
-    fun `findById returns 400 when id is invalid`() =
-        runTest {
-            val error = GitHubRepoFindByIdQueryError.InvalidId(GitHubError.InvalidId(0L))
-            coEvery { findByIdQuery.execute(0L) } returns Either.Left(error)
-
-            val response = controller.findById(0L)
-            response.statusCode shouldBe HttpStatus.BAD_REQUEST
-            response.body shouldBe ErrorResponse(error.message)
-        }
+        val response = controller.findById(1L)
+        response.statusCode shouldBe HttpStatus.OK
+        response.body shouldBe GitHubRepoResponse.fromQueryDto(dto)
+    }
 
     @Test
-    fun `findById returns 404 when repo is not found`() =
-        runTest {
-            val error = GitHubRepoFindByIdQueryError.NotFound(1L)
-            coEvery { findByIdQuery.execute(1L) } returns Either.Left(error)
+    fun `findById returns 400 when id is invalid`() {
+        val error = GitHubRepoFindByIdQueryError.InvalidId(GitHubError.InvalidId(0L))
+        every { findByIdQuery.execute(0L) } returns Either.Left(error)
 
-            val response = controller.findById(1L)
-            response.statusCode shouldBe HttpStatus.NOT_FOUND
-        }
+        val response = controller.findById(0L)
+        response.statusCode shouldBe HttpStatus.BAD_REQUEST
+        response.body shouldBe ErrorResponse(error.message)
+    }
 
     @Test
-    fun `findById returns 500 when fetch fails`() =
-        runTest {
-            val error = GitHubRepoFindByIdQueryError.FetchFailed("DB error")
-            coEvery { findByIdQuery.execute(1L) } returns Either.Left(error)
+    fun `findById returns 404 when repo is not found`() {
+        val error = GitHubRepoFindByIdQueryError.NotFound(1L)
+        every { findByIdQuery.execute(1L) } returns Either.Left(error)
 
-            val response = controller.findById(1L)
-            response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-            response.body shouldBe ErrorResponse("Internal server error")
-        }
+        val response = controller.findById(1L)
+        response.statusCode shouldBe HttpStatus.NOT_FOUND
+    }
+
+    @Test
+    fun `findById returns 500 when fetch fails`() {
+        val error = GitHubRepoFindByIdQueryError.FetchFailed("DB error")
+        every { findByIdQuery.execute(1L) } returns Either.Left(error)
+
+        val response = controller.findById(1L)
+        response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+        response.body shouldBe ErrorResponse("Internal server error")
+    }
 
     // --- save ---
 
     @Test
-    fun `save returns 200 with repo body on success`() =
-        runTest {
-            val repo = sampleRepo()
-            coEvery { saveUseCase.execute(any()) } returns Either.Right(repo)
+    fun `save returns 200 with repo body on success`() {
+        val repo = sampleRepo()
+        every { saveUseCase.execute(any()) } returns Either.Right(repo)
 
-            val response = controller.save(sampleRequest())
-            response.statusCode shouldBe HttpStatus.OK
-            response.body shouldBe GitHubRepoResponse.fromDomain(repo)
-        }
-
-    @Test
-    fun `save returns 422 with error body when validation fails`() =
-        runTest {
-            val error = GitHubRepoSaveError.ValidationFailed(GitHubError.InvalidId(0L))
-            coEvery { saveUseCase.execute(any()) } returns Either.Left(error)
-
-            val response = controller.save(sampleRequest())
-            response.statusCode shouldBe HttpStatus.UNPROCESSABLE_CONTENT
-            response.body shouldBe ErrorResponse(error.message)
-        }
+        val response = controller.save(sampleRequest())
+        response.statusCode shouldBe HttpStatus.OK
+        response.body shouldBe GitHubRepoResponse.fromDomain(repo)
+    }
 
     @Test
-    fun `save returns 500 with error body when save fails`() =
-        runTest {
-            val error = GitHubRepoSaveError.SaveFailed(GitHubError.RepositoryError("Save failed"))
-            coEvery { saveUseCase.execute(any()) } returns Either.Left(error)
+    fun `save returns 422 with error body when validation fails`() {
+        val error = GitHubRepoSaveError.ValidationFailed(GitHubError.InvalidId(0L))
+        every { saveUseCase.execute(any()) } returns Either.Left(error)
 
-            val response = controller.save(sampleRequest())
-            response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-            response.body shouldBe ErrorResponse("Internal server error")
-        }
+        val response = controller.save(sampleRequest())
+        response.statusCode shouldBe HttpStatus.UNPROCESSABLE_CONTENT
+        response.body shouldBe ErrorResponse(error.message)
+    }
+
+    @Test
+    fun `save returns 500 with error body when save fails`() {
+        val error = GitHubRepoSaveError.SaveFailed(GitHubError.RepositoryError("Save failed"))
+        every { saveUseCase.execute(any()) } returns Either.Left(error)
+
+        val response = controller.save(sampleRequest())
+        response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+        response.body shouldBe ErrorResponse("Internal server error")
+    }
 }
 
 private fun sampleQueryDto() =

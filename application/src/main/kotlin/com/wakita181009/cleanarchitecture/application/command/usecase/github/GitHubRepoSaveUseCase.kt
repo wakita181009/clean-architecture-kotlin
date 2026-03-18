@@ -6,5 +6,5 @@ import com.wakita181009.cleanarchitecture.application.command.error.github.GitHu
 import com.wakita181009.cleanarchitecture.domain.entity.github.GitHubRepo
 
 interface GitHubRepoSaveUseCase {
-    suspend fun execute(dto: GitHubRepoDto): Either<GitHubRepoSaveError, GitHubRepo>
+    fun execute(dto: GitHubRepoDto): Either<GitHubRepoSaveError, GitHubRepo>
 }

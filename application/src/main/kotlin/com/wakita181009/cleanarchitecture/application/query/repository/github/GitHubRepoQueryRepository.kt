@@ -7,9 +7,9 @@ import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubR
 import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubRepoListQueryError
 
 interface GitHubRepoQueryRepository {
-    suspend fun findById(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto>
+    fun findById(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto>
 
-    suspend fun list(
+    fun list(
         limit: Int,
         offset: Int,
     ): Either<GitHubRepoListQueryError, PageDto<GitHubRepoQueryDto>>

@@ -5,5 +5,5 @@ import com.wakita181009.cleanarchitecture.application.query.dto.github.GitHubRep
 import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubRepoFindByIdQueryError
 
 interface GitHubRepoFindByIdQueryUseCase {
-    suspend fun execute(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto>
+    fun execute(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto>
 }

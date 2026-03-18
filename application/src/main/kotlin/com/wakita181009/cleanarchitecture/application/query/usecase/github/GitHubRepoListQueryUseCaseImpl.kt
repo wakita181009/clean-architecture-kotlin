@@ -12,7 +12,7 @@ import com.wakita181009.cleanarchitecture.domain.valueobject.PageSize
 class GitHubRepoListQueryUseCaseImpl(
     private val queryRepository: GitHubRepoQueryRepository,
 ) : GitHubRepoListQueryUseCase {
-    override suspend fun execute(
+    override fun execute(
         pageNumber: Int,
         pageSize: Int,
     ): Either<GitHubRepoListQueryError, PageDto<GitHubRepoQueryDto>> =

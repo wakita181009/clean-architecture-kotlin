@@ -8,9 +8,8 @@ import com.wakita181009.cleanarchitecture.domain.error.github.GitHubError
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
 import java.time.OffsetDateTime
 import kotlin.test.Test
 
@@ -19,39 +18,35 @@ class GitHubRepoFindByIdQueryUseCaseImplTest {
     private val query = GitHubRepoFindByIdQueryUseCaseImpl(queryRepository)
 
     @Test
-    fun `execute returns Right with dto when found`() =
-        runTest {
-            val dto = sampleQueryDto()
-            coEvery { queryRepository.findById(1L) } returns Either.Right(dto)
+    fun `execute returns Right with dto when found`() {
+        val dto = sampleQueryDto()
+        every { queryRepository.findById(1L) } returns Either.Right(dto)
 
-            query.execute(1L).shouldBeRight(dto)
-        }
-
-    @Test
-    fun `execute returns Left InvalidId when id is not positive`() =
-        runTest {
-            val error = query.execute(0L).shouldBeLeft()
-            error shouldBe GitHubRepoFindByIdQueryError.InvalidId(GitHubError.InvalidId(0L))
-        }
+        query.execute(1L).shouldBeRight(dto)
+    }
 
     @Test
-    fun `execute returns Left NotFound when repository returns NotFound`() =
-        runTest {
-            coEvery { queryRepository.findById(1L) } returns Either.Left(GitHubRepoFindByIdQueryError.NotFound(1L))
-
-            val error = query.execute(1L).shouldBeLeft()
-            error shouldBe GitHubRepoFindByIdQueryError.NotFound(1L)
-        }
+    fun `execute returns Left InvalidId when id is not positive`() {
+        val error = query.execute(0L).shouldBeLeft()
+        error shouldBe GitHubRepoFindByIdQueryError.InvalidId(GitHubError.InvalidId(0L))
+    }
 
     @Test
-    fun `execute returns Left FetchFailed when repository returns error`() =
-        runTest {
-            val fetchError = GitHubRepoFindByIdQueryError.FetchFailed("DB error")
-            coEvery { queryRepository.findById(1L) } returns Either.Left(fetchError)
+    fun `execute returns Left NotFound when repository returns NotFound`() {
+        every { queryRepository.findById(1L) } returns Either.Left(GitHubRepoFindByIdQueryError.NotFound(1L))
 
-            val error = query.execute(1L).shouldBeLeft()
-            error shouldBe fetchError
-        }
+        val error = query.execute(1L).shouldBeLeft()
+        error shouldBe GitHubRepoFindByIdQueryError.NotFound(1L)
+    }
+
+    @Test
+    fun `execute returns Left FetchFailed when repository returns error`() {
+        val fetchError = GitHubRepoFindByIdQueryError.FetchFailed("DB error")
+        every { queryRepository.findById(1L) } returns Either.Left(fetchError)
+
+        val error = query.execute(1L).shouldBeLeft()
+        error shouldBe fetchError
+    }
 }
 
 private fun sampleQueryDto() =

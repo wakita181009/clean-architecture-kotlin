@@ -13,7 +13,6 @@ dependencies {
     implementation(platform(libs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation(libs.kotlinx.coroutines.reactor)
     compileOnly("org.springframework.boot:spring-boot-devtools")
 }
 

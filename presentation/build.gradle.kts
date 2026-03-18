@@ -20,7 +20,6 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.assertions.arrow)
-    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask>().configureEach {

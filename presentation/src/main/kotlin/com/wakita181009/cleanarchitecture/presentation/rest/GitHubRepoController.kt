@@ -30,7 +30,7 @@ class GitHubRepoController(
     private val logger = LoggerFactory.getLogger(GitHubRepoController::class.java)
 
     @GetMapping
-    suspend fun list(
+    fun list(
         @RequestParam(defaultValue = "1") pageNumber: Int,
         @RequestParam(defaultValue = "20") pageSize: Int,
     ): ResponseEntity<*> =
@@ -52,7 +52,7 @@ class GitHubRepoController(
         )
 
     @GetMapping("/{id}")
-    suspend fun findById(
+    fun findById(
         @PathVariable id: Long,
     ): ResponseEntity<*> =
         gitHubRepoFindByIdQueryUseCase.execute(id).fold(
@@ -74,7 +74,7 @@ class GitHubRepoController(
         )
 
     @PostMapping
-    suspend fun save(
+    fun save(
         @RequestBody request: GitHubRepoRequest,
     ): ResponseEntity<*> =
         gitHubRepoSaveUseCase.execute(request.toDto()).fold(

@@ -10,7 +10,7 @@ import com.wakita181009.cleanarchitecture.domain.valueobject.github.GitHubRepoId
 class GitHubRepoFindByIdQueryUseCaseImpl(
     private val queryRepository: GitHubRepoQueryRepository,
 ) : GitHubRepoFindByIdQueryUseCase {
-    override suspend fun execute(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto> =
+    override fun execute(id: Long): Either<GitHubRepoFindByIdQueryError, GitHubRepoQueryDto> =
         either {
             val repoId = GitHubRepoId.of(id).mapLeft(GitHubRepoFindByIdQueryError::InvalidId).bind()
             queryRepository.findById(repoId.value).bind()

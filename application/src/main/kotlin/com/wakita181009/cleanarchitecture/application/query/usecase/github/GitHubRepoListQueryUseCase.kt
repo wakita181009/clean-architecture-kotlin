@@ -6,7 +6,7 @@ import com.wakita181009.cleanarchitecture.application.query.dto.github.GitHubRep
 import com.wakita181009.cleanarchitecture.application.query.error.github.GitHubRepoListQueryError
 
 interface GitHubRepoListQueryUseCase {
-    suspend fun execute(
+    fun execute(
         pageNumber: Int,
         pageSize: Int,
     ): Either<GitHubRepoListQueryError, PageDto<GitHubRepoQueryDto>>

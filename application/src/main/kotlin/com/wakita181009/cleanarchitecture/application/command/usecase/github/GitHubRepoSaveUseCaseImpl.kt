@@ -10,7 +10,7 @@ import com.wakita181009.cleanarchitecture.domain.repository.github.GitHubRepoRep
 class GitHubRepoSaveUseCaseImpl(
     private val gitHubRepoRepository: GitHubRepoRepository,
 ) : GitHubRepoSaveUseCase {
-    override suspend fun execute(dto: GitHubRepoDto): Either<GitHubRepoSaveError, GitHubRepo> =
+    override fun execute(dto: GitHubRepoDto): Either<GitHubRepoSaveError, GitHubRepo> =
         either {
             val repo = dto.toDomain().mapLeft(GitHubRepoSaveError::ValidationFailed).bind()
             gitHubRepoRepository
